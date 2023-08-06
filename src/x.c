@@ -2232,47 +2232,52 @@ main(int argc, char **argv)
 	args  = args_new(argc, (const char **)argv);
 	argv0 = (char*)args_shift(&args);
 
-	xw.l = xw.t = 0;
-	xw.isfixed = False;
-	xsetcursor(cursorstyle);
+	flag_bool("a", NULL,      "Disallow alt screen buffer", &opt_a);
+	flag_bool("i", NULL,      "", &opt_i);
+	flag_bool("h", "help",    "Show the usage",   &opt_h);
+	flag_bool("v", "version", "Show the version", &opt_v);
 
-	flag_bool("a", NULL, "", &opt_a);
-	flag_bool("i", NULL, "", &opt_i);
-	flag_bool("h", NULL, "", &opt_h);
-	flag_bool("v", NULL, "", &opt_v);
+	flag_str("A", NULL, "Transparency",           (const char**)&opt_alpha);
+	flag_str("c", NULL, "Class",                  (const char**)&opt_class);
+	flag_str("f", NULL, "Font",                   (const char**)&opt_font);
+	flag_str("o", NULL, "File",                   (const char**)&opt_io);
+	flag_str("l", NULL, "Line",                   (const char**)&opt_line);
+	flag_str("n", NULL, "Name",                   (const char**)&opt_name);
+	flag_str("t", NULL, "Set the terminal title", (const char**)&opt_title);
+	flag_str("w", NULL, "Set windowid",           (const char**)&opt_embed);
+	flag_str("g", NULL, "Set geometry",           (const char**)&opt_geo);
 
-	flag_str("A", NULL, "",         (const char**)&opt_alpha);
-	flag_str("c", NULL, "class",    (const char**)&opt_class);
-	flag_str("f", NULL, "font",     (const char**)&opt_font);
-	flag_str("o", NULL, "file",     (const char**)&opt_io);
-	flag_str("l", NULL, "line",     (const char**)&opt_line);
-	flag_str("n", NULL, "name",     (const char**)&opt_name);
-	flag_str("t", NULL, "title",    (const char**)&opt_title);
-	flag_str("w", NULL, "windowid", (const char**)&opt_embed);
-	flag_str("g", NULL, "geometry", (const char**)&opt_geo);
+	size_t opt_rows = rows, opt_cols = cols;
+	flag_size(NULL, "rows", "Set terminal rows",    &opt_rows);
+	flag_size(NULL, "cols", "Set terminal columns", &opt_cols);
 
 	size_t where;
 	args_t stripped;
 	bool   extra;
 	if (args_parse_flags(&args, &where, &stripped, &extra) != 0) {
 		usage(stderr);
-		die("\narg %s: %s\n", args.v[where], noch_get_err_msg());
+		die("\narg \"%s\": %s\n", args.v[where], noch_get_err_msg());
 	}
 
 	if (opt_v) {printf("%s " VERSION "\n", argv0); return 0;}
 	if (opt_h) {usage(stdout);                     return 0;}
+
+	xw.l = xw.t = 0;
+	xw.isfixed = False;
+	xsetcursor(cursorstyle);
+
 	if (opt_i) xw.isfixed     = 1;
 	if (opt_a) allowaltscreen = 0;
 
-	if (opt_geo)        xw.gm = XParseGeometry(opt_geo, &xw.l, &xw.t, &cols, &rows);
+	if (opt_geo)        xw.gm     = XParseGeometry(opt_geo, &xw.l, &xw.t, &cols, &rows);
 	if (!opt_title)     opt_title = (opt_line || !opt_cmd) ? "st" : opt_cmd[0];
 	if (stripped.c > 0) opt_cmd   = (char**)stripped.v;
 
 	load_config();
 	setlocale(LC_CTYPE, "");
 	XSetLocaleModifiers("");
-	cols = MAX(cols, 1);
-	rows = MAX(rows, 1);
+	cols = MAX(((int)opt_cols), 1);
+	rows = MAX(((int)opt_rows), 1);
 	tnew(cols, rows);
 	xinit(cols, rows);
 	xsetenv();

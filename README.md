@@ -16,6 +16,7 @@ This is my own [suckless st](https://st.suckless.org/) modification which adds:
 - A blinking cursor
 - Background transparency
 - A JSON config file (`~/.config/st.json`)
+- Rows and cols command line options
 - New command line arguments system
 
 ## Table of contents
