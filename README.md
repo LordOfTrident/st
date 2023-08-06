@@ -1,7 +1,7 @@
 <p align="center"><img width="350px" src="./res/logo.png"></p>
 <p align="center">
 	<a href="./LICENSE">
-		<img alt="License" src="https://img.shields.io/badge/license-MIT%2FX-26c374?style=for-the-badge">
+		<img alt="License" src="https://img.shields.io/badge/license-MIT%2FX Consortium-26c374?style=for-the-badge">
 	</a>
 	<a href="https://github.com/LordOfTrident/st/issues">
 		<img alt="Issues" src="https://img.shields.io/github/issues/LordOfTrident/st?style=for-the-badge&color=4f79e4">
