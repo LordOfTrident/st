@@ -2120,9 +2120,9 @@ create_config(const char *path)
 }
 
 json_t*
-json_load(json_t *j, const char *key, const char *path, json_type_t type)
+json_load(json_obj_t *obj, const char *key, const char *path, json_type_t type)
 {
-	json_t *ret = json_obj_at(j, key);
+	json_t *ret = json_obj_at(obj, key);
 	if (ret == NULL)
 		die("%s: %s: Missing\n", path, key);
 	else if (ret->type != type)
@@ -2170,35 +2170,42 @@ retry:
 	if (j->type != JSON_OBJ)
 		die("%s: Expected object\n", path);
 
-	font  = xstrdup(json_load(j, "font",  path, JSON_STR)->as.str.buf);
-	font2 = xstrdup(json_load(j, "font2", path, JSON_STR)->as.str.buf);
-	shell = xstrdup(json_load(j, "shell", path, JSON_STR)->as.str.buf);
+	json_obj_t *obj = JSON_AS_OBJ(j);
 
-	borderpx        = (int)     json_load(j, "border-px",        path, JSON_INT64)->as.int64;
-	blinktimeout    = (unsigned)json_load(j, "blink-timeout",    path, JSON_INT64)->as.int64;
-	cursorthickness = (unsigned)json_load(j, "cursor-thickness", path, JSON_INT64)->as.int64;
-	bellvolume      = (int)     json_load(j, "bell-volume",      path, JSON_INT64)->as.int64;
-	tabspaces       = (unsigned)json_load(j, "tab-spaces",       path, JSON_INT64)->as.int64;
-	cursorshape     = (unsigned)json_load(j, "cursor-shape",     path, JSON_INT64)->as.int64;
-	rows            = (unsigned)json_load(j, "default-rows",     path, JSON_INT64)->as.int64;
-	cols            = (unsigned)json_load(j, "default-cols",     path, JSON_INT64)->as.int64;
+#define JSON_LOAD_STR(OBJ, KEY, PATH) xstrdup(JSON_AS_STR(json_load(OBJ, KEY, PATH, JSON_STR))->buf)
 
-	alpha   = json_load(j, "bg-opacity",        path, JSON_FLOAT)->as.float_;
-	cwscale = json_load(j, "char-width-scale",  path, JSON_FLOAT)->as.float_;
-	chscale = json_load(j, "char-height-scale", path, JSON_FLOAT)->as.float_;
+	font  = JSON_LOAD_STR(obj, "font",  path);
+	font2 = JSON_LOAD_STR(obj, "font2", path);
+	shell = JSON_LOAD_STR(obj, "shell", path);
 
-	json_t *j_colors = json_load(j, "colors", path, JSON_OBJ);
+#define JSON_LOAD_INT(OBJ, KEY, PATH) JSON_AS_INT(json_load(OBJ, KEY, PATH, JSON_INT))->val
 
-	colorname[defaultfg]  = xstrdup(json_load(j_colors, "default-fg",  path, JSON_STR)->as.str.buf);
-	colorname[defaultbg]  = xstrdup(json_load(j_colors, "default-bg",  path, JSON_STR)->as.str.buf);
-	colorname[defaultrcs] = xstrdup(json_load(j_colors, "default-rfg", path, JSON_STR)->as.str.buf);
-	colorname[defaultcs]  = xstrdup(json_load(j_colors, "default-rbg", path, JSON_STR)->as.str.buf);
+	borderpx        = (int)     JSON_LOAD_INT(obj, "border-px",        path);
+	blinktimeout    = (unsigned)JSON_LOAD_INT(obj, "blink-timeout",    path);
+	cursorthickness = (unsigned)JSON_LOAD_INT(obj, "cursor-thickness", path);
+	bellvolume      = (int)     JSON_LOAD_INT(obj, "bell-volume",      path);
+	tabspaces       = (unsigned)JSON_LOAD_INT(obj, "tab-spaces",       path);
+	cursorshape     = (unsigned)JSON_LOAD_INT(obj, "cursor-shape",     path);
+	rows            = (unsigned)JSON_LOAD_INT(obj, "default-rows",     path);
+	cols            = (unsigned)JSON_LOAD_INT(obj, "default-cols",     path);
+
+#define JSON_LOAD_FLOAT(OBJ, KEY, PATH) JSON_AS_FLOAT(json_load(OBJ, KEY, PATH, JSON_FLOAT))->val
+
+	alpha   = JSON_LOAD_FLOAT(obj, "bg-opacity",        path);
+	cwscale = JSON_LOAD_FLOAT(obj, "char-width-scale",  path);
+	chscale = JSON_LOAD_FLOAT(obj, "char-height-scale", path);
+
+	json_obj_t *colors = JSON_AS_OBJ(json_load(obj, "colors", path, JSON_OBJ));
+
+	colorname[defaultfg]  = JSON_LOAD_STR(colors, "default-fg",  path);
+	colorname[defaultbg]  = JSON_LOAD_STR(colors, "default-bg",  path);
+	colorname[defaultrcs] = JSON_LOAD_STR(colors, "default-rfg", path);
+	colorname[defaultcs]  = JSON_LOAD_STR(colors, "default-rbg", path);
 
 	{
 		int i = 0;
 
-#define JSON_LOAD_COLOR(NAME) \
-	colorname[i ++] = xstrdup(json_load(j_colors, NAME, path, JSON_STR)->as.str.buf)
+#define JSON_LOAD_COLOR(NAME) colorname[i ++] = JSON_LOAD_STR(colors, NAME, path)
 
 		JSON_LOAD_COLOR("black");
 		JSON_LOAD_COLOR("red");
