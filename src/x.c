@@ -2170,15 +2170,15 @@ retry:
 	if (j->type != JSON_OBJ)
 		die("%s: Expected object\n", path);
 
-	json_obj_t *obj = JSON_AS_OBJ(j);
+	json_obj_t *obj = JSON_OBJ(j);
 
-#define JSON_LOAD_STR(OBJ, KEY, PATH) xstrdup(JSON_AS_STR(json_load(OBJ, KEY, PATH, JSON_STR))->buf)
+#define JSON_LOAD_STR(OBJ, KEY, PATH) xstrdup(JSON_STR(json_load(OBJ, KEY, PATH, JSON_STR))->buf)
 
 	font  = JSON_LOAD_STR(obj, "font",  path);
 	font2 = JSON_LOAD_STR(obj, "font2", path);
 	shell = JSON_LOAD_STR(obj, "shell", path);
 
-#define JSON_LOAD_INT(OBJ, KEY, PATH) JSON_AS_INT(json_load(OBJ, KEY, PATH, JSON_INT))->val
+#define JSON_LOAD_INT(OBJ, KEY, PATH) JSON_INT(json_load(OBJ, KEY, PATH, JSON_INT))->val
 
 	borderpx        = (int)     JSON_LOAD_INT(obj, "border-px",        path);
 	blinktimeout    = (unsigned)JSON_LOAD_INT(obj, "blink-timeout",    path);
@@ -2189,13 +2189,13 @@ retry:
 	rows            = (unsigned)JSON_LOAD_INT(obj, "default-rows",     path);
 	cols            = (unsigned)JSON_LOAD_INT(obj, "default-cols",     path);
 
-#define JSON_LOAD_FLOAT(OBJ, KEY, PATH) JSON_AS_FLOAT(json_load(OBJ, KEY, PATH, JSON_FLOAT))->val
+#define JSON_LOAD_FLOAT(OBJ, KEY, PATH) JSON_FLOAT(json_load(OBJ, KEY, PATH, JSON_FLOAT))->val
 
 	alpha   = JSON_LOAD_FLOAT(obj, "bg-opacity",        path);
 	cwscale = JSON_LOAD_FLOAT(obj, "char-width-scale",  path);
 	chscale = JSON_LOAD_FLOAT(obj, "char-height-scale", path);
 
-	json_obj_t *colors = JSON_AS_OBJ(json_load(obj, "colors", path, JSON_OBJ));
+	json_obj_t *colors = JSON_OBJ(json_load(obj, "colors", path, JSON_OBJ));
 
 	colorname[defaultfg]  = JSON_LOAD_STR(colors, "default-fg",  path);
 	colorname[defaultbg]  = JSON_LOAD_STR(colors, "default-bg",  path);
