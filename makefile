@@ -29,7 +29,7 @@ $(BIN):
 	mkdir -p $(BIN)
 
 clean:
-	rm -f $(OUT) $(BIN)/* st-$(VERSION).tar.gz
+	rm -f $(OUT) $(BIN)/*
 
 install: st
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
